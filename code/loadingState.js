@@ -10,7 +10,6 @@ Mario.LoadingState = function() {
     this.ColorDirection = 1;
     this.ImageIndex = 0;
     this.SoundIndex = 0;
-    this.MarylandColorsApplied = false;
 };
 
 Mario.LoadingState.prototype = new Enjine.GameState();
@@ -113,11 +112,6 @@ Mario.LoadingState.prototype.Update = function(delta) {
             }
         }
     }
-
-    if (this.ImagesLoaded && !this.MarylandColorsApplied) {
-        this.ApplyMarylandPalette();
-        this.MarylandColorsApplied = true;
-    }
     
     this.ScreenColor += this.ColorDirection * 255 * delta;
     if (this.ScreenColor > 255) {
@@ -146,59 +140,5 @@ Mario.LoadingState.prototype.CheckForChange = function(context) {
 		Mario.GlobalMapState = new Mario.MapState();
 	
         context.ChangeState(new Mario.TitleState());
-    }
-};
-
-Mario.LoadingState.prototype.ApplyMarylandPalette = function() {
-    var sheetNames = ["mario", "smallMario", "fireMario", "racoonMario"];
-    var mdRed = { r: 200, g: 16, b: 46 };
-    var mdGold = { r: 255, g: 210, b: 0 };
-
-    function isBlue(r, g, b) {
-        return b >= 120 && r <= 100 && g <= 120 && b >= r + 30 && b >= g + 20;
-    }
-
-    function isRed(r, g, b) {
-        return r >= 120 && g <= 90 && b <= 90 && r >= g + 20 && r >= b + 20;
-    }
-
-    function recolor(image) {
-        var canvas = document.createElement("canvas");
-        canvas.width = image.width;
-        canvas.height = image.height;
-        var context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0);
-        var imageData = context.getImageData(0, 0, canvas.width, canvas.height);
-        var data = imageData.data;
-        for (var i = 0; i < data.length; i += 4) {
-            var alpha = data[i + 3];
-            if (alpha === 0) {
-                continue;
-            }
-            var r = data[i];
-            var g = data[i + 1];
-            var b = data[i + 2];
-            if (isBlue(r, g, b)) {
-                data[i] = mdGold.r;
-                data[i + 1] = mdGold.g;
-                data[i + 2] = mdGold.b;
-            } else if (isRed(r, g, b)) {
-                data[i] = mdRed.r;
-                data[i + 1] = mdRed.g;
-                data[i + 2] = mdRed.b;
-            }
-        }
-        context.putImageData(imageData, 0, 0);
-
-        var updated = new Image();
-        updated.src = canvas.toDataURL("image/png");
-        return updated;
-    }
-
-    for (var i = 0; i < sheetNames.length; i++) {
-        var name = sheetNames[i];
-        if (Enjine.Resources.Images[name]) {
-            Enjine.Resources.Images[name] = recolor(Enjine.Resources.Images[name]);
-        }
     }
 };
