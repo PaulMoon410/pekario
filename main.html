@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Infinite Mario - JavaScript</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+                background: radial-gradient(circle at center, #2b2f3a 0%, #0f1116 60%, #090a0d 100%);
+                font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            }
+
+            body {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .arcade-cabinet {
+                position: relative;
+                padding: 28px;
+                border-radius: 16px;
+                background: linear-gradient(145deg, #2b2f3a, #151820);
+                box-shadow:
+                    0 30px 60px rgba(0, 0, 0, 0.6),
+                    inset 0 0 0 2px rgba(255, 255, 255, 0.08),
+                    inset 0 0 25px rgba(0, 0, 0, 0.7);
+            }
+
+            .arcade-cabinet::before {
+                content: "PEKARIO";
+                position: absolute;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 14px;
+                letter-spacing: 6px;
+                color: rgba(255, 255, 255, 0.75);
+                text-shadow: 0 0 8px rgba(70, 170, 255, 0.6);
+            }
+
+            .screen-frame {
+                position: relative;
+                padding: 14px;
+                border-radius: 12px;
+                background: #0b0d12;
+                box-shadow:
+                    inset 0 0 0 2px rgba(255, 255, 255, 0.06),
+                    inset 0 0 25px rgba(0, 0, 0, 0.9);
+            }
+
+            .screen-frame::after {
+                content: "";
+                pointer-events: none;
+                position: absolute;
+                top: 14px;
+                left: 14px;
+                right: 14px;
+                bottom: 14px;
+                border-radius: 8px;
+                background:
+                    repeating-linear-gradient(
+                        to bottom,
+                        rgba(255, 255, 255, 0.04),
+                        rgba(255, 255, 255, 0.04) 1px,
+                        rgba(0, 0, 0, 0) 2px,
+                        rgba(0, 0, 0, 0) 4px
+                    );
+                mix-blend-mode: screen;
+                opacity: 0.35;
+            }
+
+            #canvas {
+                display: block;
+                width: 640px;
+                height: 480px;
+                border-radius: 6px;
+                background: #000;
+                image-rendering: pixelated;
+                box-shadow: 0 0 25px rgba(70, 170, 255, 0.25);
+            }
+
+            @media (max-width: 720px), (max-height: 560px) {
+                #canvas {
+                    width: 85vw;
+                    height: auto;
+                }
+            }
+
+            .mobile-controls {
+                position: fixed;
+                left: 0;
+                right: 0;
+                bottom: 12px;
+                display: none;
+                justify-content: space-between;
+                align-items: flex-end;
+                padding: 0 16px;
+                z-index: 5;
+                pointer-events: none;
+                touch-action: none;
+            }
+
+            .control-pad,
+            .control-buttons {
+                display: grid;
+                gap: 10px;
+                pointer-events: auto;
+                touch-action: none;
+            }
+
+            .control-pad {
+                grid-template-columns: repeat(3, 54px);
+                grid-template-rows: repeat(2, 54px);
+            }
+
+            .control-buttons {
+                grid-template-columns: repeat(2, 64px);
+                grid-template-rows: repeat(2, 64px);
+            }
+
+            .control-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 12px;
+                background: rgba(10, 12, 18, 0.75);
+                color: #e6eefc;
+                font-size: 14px;
+                font-weight: 600;
+                text-transform: uppercase;
+                border: 1px solid rgba(255, 255, 255, 0.12);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+                user-select: none;
+                -webkit-user-select: none;
+                touch-action: none;
+            }
+
+            .control-btn:active,
+            .control-btn.is-active {
+                background: rgba(70, 170, 255, 0.25);
+                border-color: rgba(70, 170, 255, 0.55);
+                box-shadow: 0 0 12px rgba(70, 170, 255, 0.35);
+            }
+
+            @media (pointer: coarse) {
+                .mobile-controls {
+                    display: flex;
+                }
+            }
+        </style>
+	</head>
+	<body>
+        <div class="arcade-cabinet">
+            <div class="screen-frame">
+                <canvas id="canvas" width="640" height="480">
+                    <p>Your browser does not support the canvas element.</p>
+                </canvas>
+            </div>
+        </div>
+        <div class="mobile-controls" aria-hidden="true">
+            <div class="control-pad">
+                <div></div>
+                <button class="control-btn" data-key="38">Up</button>
+                <div></div>
+                <button class="control-btn" data-key="37">Left</button>
+                <button class="control-btn" data-key="40">Down</button>
+                <button class="control-btn" data-key="39">Right</button>
+            </div>
+            <div class="control-buttons">
+                <button class="control-btn" data-key="65">Run</button>
+                <button class="control-btn" data-key="83">Jump</button>
+                <button class="control-btn" data-key="65">Fire</button>
+                <button class="control-btn" data-key="83">Start</button>
+            </div>
+        </div>
+
+        <!-- Enjine Includes -->
+        <script src="Enjine/core.js"></script>
+        <script src="Enjine/gameCanvas.js"></script>
+        <script src="Enjine/keyboardInput.js"></script>
+        <script src="Enjine/resources.js"></script>
+        <script src="Enjine/drawable.js"></script>
+        <script src="Enjine/state.js"></script>
+        <script src="Enjine/gameTimer.js"></script>
+        <script src="Enjine/camera.js"></script>
+        <script src="Enjine/drawableManager.js"></script>
+        <script src="Enjine/sprite.js"></script>
+        <script src="Enjine/spriteFont.js"></script>
+        <script src="Enjine/frameSprite.js"></script>
+        <script src="Enjine/animatedSprite.js"></script>
+        <script src="Enjine/collideable.js"></script>
+        <script src="Enjine/application.js"></script>
+
+        <!-- Actual game code -->
+        <script src="code/setup.js"></script>
+        <script src="code/spriteCuts.js"></script>
+        <script src="code/level.js"></script>
+        <script src="code/backgroundGenerator.js"></script>
+        <script src="code/backgroundRenderer.js"></script>
+        <script src="code/improvedNoise.js"></script>
+        <script src="code/notchSprite.js"></script>
+        <script src="code/character.js"></script>
+        <script src="code/levelRenderer.js"></script>
+        <script src="code/levelGenerator.js"></script>
+        <script src="code/spriteTemplate.js"></script>
+        <script src="code/enemy.js"></script>
+        <script src="code/fireball.js"></script>
+        <script src="code/sparkle.js"></script>
+        <script src="code/coinAnim.js"></script>
+        <script src="code/mushroom.js"></script>
+		<script src="code/particle.js"></script>
+		<script src="code/fireFlower.js"></script>
+        <script src="code/bulletBill.js"></script>
+        <script src="code/flowerEnemy.js"></script>
+        <script src="code/shell.js"></script>
+
+        <script src="code/titleState.js"></script>
+        <script src="code/loadingState.js"></script>
+        <script src="code/loseState.js"></script>
+        <script src="code/winState.js"></script>
+        <script src="code/mapState.js"></script>
+        <script src="code/levelState.js"></script>
+
+        <script src="code/music.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
+
+                function setKeyDown(keyCode, isDown) {
+                    Enjine.KeyboardInput.Pressed[keyCode] = isDown;
+                }
+
+                function handlePress(target, isDown) {
+                    var keyCode = parseInt(target.getAttribute("data-key"), 10);
+                    if (isDown) {
+                        setKeyDown(keyCode, true);
+                        target.classList.add("is-active");
+                    } else {
+                        setKeyDown(keyCode, false);
+                        target.classList.remove("is-active");
+                    }
+                }
+
+                $(".control-btn").each(function() {
+                    var el = this;
+
+                    function onPressStart(e) {
+                        e.preventDefault();
+                        if (e.pointerId != null && el.setPointerCapture) {
+                            el.setPointerCapture(e.pointerId);
+                        }
+                        handlePress(el, true);
+                    }
+
+                    function onPressEnd(e) {
+                        e.preventDefault();
+                        handlePress(el, false);
+                    }
+
+                    el.addEventListener("pointerdown", onPressStart);
+                    el.addEventListener("pointerup", onPressEnd);
+                    el.addEventListener("pointercancel", onPressEnd);
+                    el.addEventListener("lostpointercapture", onPressEnd);
+
+                    el.addEventListener("touchstart", onPressStart, { passive: false });
+                    el.addEventListener("touchend", onPressEnd, { passive: false });
+                    el.addEventListener("touchcancel", onPressEnd, { passive: false });
+                });
+            });
+        </script>
+	</body>
+</html>
