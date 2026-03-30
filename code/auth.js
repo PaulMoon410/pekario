@@ -79,6 +79,25 @@ var PekarioAuth = {
         }
     },
 
+    skipLogin: function() {
+        PekarioAuth.loggedIn = false;
+        PekarioAuth.displayName = "Guest";
+
+        // Fade out overlay then start game
+        var overlay = document.getElementById("pekario-login-overlay");
+        if (overlay) {
+            overlay.style.transition = "opacity 0.6s ease";
+            overlay.style.opacity = "0";
+            setTimeout(function() {
+                overlay.style.display = "none";
+                // Show the canvas and start the game
+                var canvas = document.getElementById("canvas");
+                if (canvas) canvas.style.display = "block";
+                new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
+            }, 650);
+        }
+    },
+
     showError: function(msg) {
         var errDiv = document.getElementById("pekario-login-error");
         if (errDiv) {

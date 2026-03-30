@@ -5,6 +5,37 @@
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
         <!-- MIDI playback library -->
         <script src="https://www.midijs.net/lib/midi.js"></script>
+        <script>
+            // Fallback object so button clicks never throw if auth script fails to load.
+            window.PekarioAuth = window.PekarioAuth || {
+                loginWithHive: function () {
+                    var errDiv = document.getElementById("pekario-login-error");
+                    if (errDiv) {
+                        errDiv.style.display = "block";
+                        errDiv.innerHTML = "Login module not loaded. Refresh the page and try again.";
+                    }
+                },
+                loginWithMetaMask: function () {
+                    var errDiv = document.getElementById("pekario-login-error");
+                    if (errDiv) {
+                        errDiv.style.display = "block";
+                        errDiv.innerHTML = "Login module not loaded. Refresh the page and try again.";
+                    }                },
+                skipLogin: function () {
+                    // Skip immediately
+                    var overlay = document.getElementById("pekario-login-overlay");
+                    if (overlay) {
+                        overlay.style.transition = "opacity 0.6s ease";
+                        overlay.style.opacity = "0";
+                        setTimeout(function() {
+                            overlay.style.display = "none";
+                            var canvas = document.getElementById("canvas");
+                            if (canvas) canvas.style.display = "block";
+                            new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
+                        }, 650);
+                    }                }
+            };
+        </script>
         <style>
             * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -103,14 +134,20 @@
             <h1>PEKARIO</h1>
             <p class="subtitle">Sign in to play</p>
 
-            <button class="login-btn" id="btn-hive" onclick="PekarioAuth.loginWithHive()">
+            <button class="login-btn" id="btn-hive" onclick="window.PekarioAuth.loginWithHive()">
                 🐝 Login with Hive Keychain
             </button>
 
             <span class="divider">── or ──</span>
 
-            <button class="login-btn" id="btn-metamask" onclick="PekarioAuth.loginWithMetaMask()">
+            <button class="login-btn" id="btn-metamask" onclick="window.PekarioAuth.loginWithMetaMask()">
                 🦊 Login with MetaMask
+            </button>
+
+            <span class="divider">── or ──</span>
+
+            <button class="login-btn" id="btn-skip" onclick="window.PekarioAuth.skipLogin()" style="background: #666; width: 200px;">
+                Skip Login
             </button>
 
             <div id="pekario-login-error"></div>
