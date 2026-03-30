@@ -1,10 +1,122 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Infinite Mario - JavaScript</title>
+		<title>Pekario</title>
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+        <!-- MIDI playback library -->
+        <script src="https://www.midijs.net/lib/midi.js"></script>
+        <style>
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+
+            body {
+                background: #111;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                font-family: 'Press Start 2P', monospace, sans-serif;
+            }
+
+            canvas {
+                display: none;
+                image-rendering: pixelated;
+                border: 4px solid #e52;
+            }
+
+            /* ── Login Overlay ── */
+            #pekario-login-overlay {
+                position: fixed;
+                inset: 0;
+                background: linear-gradient(160deg, #0d0d1a 0%, #1a0a2e 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 999;
+                gap: 24px;
+            }
+
+            #pekario-login-overlay h1 {
+                color: #f8c53a;
+                font-size: 2.4rem;
+                text-shadow: 0 0 20px #f8c53a88;
+                letter-spacing: 4px;
+            }
+
+            #pekario-login-overlay p.subtitle {
+                color: #aaa;
+                font-size: 0.75rem;
+                letter-spacing: 2px;
+            }
+
+            .login-btn {
+                width: 300px;
+                padding: 14px 20px;
+                border: none;
+                border-radius: 6px;
+                font-size: 0.9rem;
+                font-weight: bold;
+                cursor: pointer;
+                letter-spacing: 1px;
+                transition: transform 0.1s, filter 0.2s;
+            }
+            .login-btn:hover { filter: brightness(1.2); transform: scale(1.04); }
+            .login-btn:active { transform: scale(0.97); }
+
+            #btn-hive {
+                background: #e63946;
+                color: #fff;
+            }
+
+            #btn-metamask {
+                background: #f6851b;
+                color: #fff;
+            }
+
+            #pekario-login-error {
+                display: none;
+                color: #ff6b6b;
+                font-size: 0.72rem;
+                text-align: center;
+                max-width: 320px;
+                line-height: 1.8;
+            }
+            #pekario-login-error a { color: #f8c53a; }
+
+            #pekario-user-label {
+                color: #4ade80;
+                font-size: 0.7rem;
+                letter-spacing: 1px;
+            }
+
+            .divider {
+                color: #444;
+                font-size: 0.7rem;
+                letter-spacing: 3px;
+            }
+        </style>
 	</head>
 	<body>
+
+        <!-- ── Login Screen ── -->
+        <div id="pekario-login-overlay">
+            <h1>PEKARIO</h1>
+            <p class="subtitle">Sign in to play</p>
+
+            <button class="login-btn" id="btn-hive" onclick="PekarioAuth.loginWithHive()">
+                🐝 Login with Hive Keychain
+            </button>
+
+            <span class="divider">── or ──</span>
+
+            <button class="login-btn" id="btn-metamask" onclick="PekarioAuth.loginWithMetaMask()">
+                🦊 Login with MetaMask
+            </button>
+
+            <div id="pekario-login-error"></div>
+            <div id="pekario-user-label"></div>
+        </div>
+
 		<canvas id="canvas" width="640" height="480">
 			<p>Your browser does not support the canvas element.</p>
 		</canvas>
@@ -57,7 +169,8 @@
         <script src="code/levelState.js"></script>
 
         <script src="code/music.js"></script>
+        <script src="code/auth.js"></script>
 
-        <script>$(document).ready(function() { new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240) });</script>
+        <!-- Game starts ONLY after successful login (see auth.js) -->
 	</body>
 </html>

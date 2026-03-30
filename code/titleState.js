@@ -33,6 +33,11 @@ Mario.TitleState.prototype.Enter = function() {
     this.font = Mario.SpriteCuts.CreateRedFont();
     this.font.Strings[0] = { String: "Press S to Start", X: 96, Y: 120 };
 
+    // Show logged-in user on title screen
+    if (typeof PekarioAuth !== "undefined" && PekarioAuth.displayName) {
+        this.font.Strings[1] = { String: PekarioAuth.displayName.substring(0, 22), X: 4, Y: 230 };
+    }
+
     this.logoY = 20;
 
     this.drawManager.Add(bgLayer0);

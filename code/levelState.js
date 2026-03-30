@@ -40,9 +40,9 @@ Mario.LevelState.prototype.Enter = function() {
 
     //play music here
     if (this.LevelType === Mario.LevelType.Overground) {
-    	Mario.PlayOvergroundMusic();
+    	Mario.PlayNeverGonnaMusic();
     } else if (this.LevelType === Mario.LevelType.Underground) {
-    	Mario.PlayUndergroundMusic();
+    	Mario.PlayBohemianMusic();
     } else if (this.LevelType === Mario.LevelType.Castle) {
     	Mario.PlayCastleMusic();
     }

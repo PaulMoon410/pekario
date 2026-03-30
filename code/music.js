@@ -3,21 +3,24 @@
 */
 
 var midifiles = {
-	"title" : "midi/title.mid",
-	"map" : "midi/map.mid",
+	"title"      : "midi/title.mid",
+	"map"        : "midi/map.mid",
 	"background" : "midi/background.mid",
 	"overground" : "midi/overground.mid",
-	"underground" : "midi/underground.mid",
-	"castle" : "midi/castle.mid",
+	"underground": "midi/underground.mid",
+	"castle"     : "midi/castle.mid",
+	"neverGonna" : "midi/Never-Gonna-Give-You-Up-3.mid",
+	"bohemian"   : "midi/Queen - Bohemian Rhapsody.mid",
 };
 
 Mario.PlayMusic = function(name) {
 	if(name in midifiles)
 	{
-		// Currently we stop all playing tracks when playing a new one
-		// MIDIjs can't play multiple at one time
-		//MIDIjs.stop();;
-		//MIDIjs.play(midifiles[name]);
+		// Stop any currently playing track first
+		if (typeof MIDIjs !== "undefined") {
+			MIDIjs.stop();
+			MIDIjs.play(midifiles[name]);
+		}
 	}else{
 		console.error("Cannot play music track " + name + " as i have no data for it.");
 	}
@@ -44,5 +47,15 @@ Mario.PlayCastleMusic = function() {
 };
 
 Mario.StopMusic = function() {
-	//MIDIjs.stop();
+	if (typeof MIDIjs !== "undefined") {
+		MIDIjs.stop();
+	}
+};
+
+Mario.PlayNeverGonnaMusic = function() {
+	Mario.PlayMusic("neverGonna");
+};
+
+Mario.PlayBohemianMusic = function() {
+	Mario.PlayMusic("bohemian");
 };
