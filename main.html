@@ -20,7 +20,8 @@
                     if (errDiv) {
                         errDiv.style.display = "block";
                         errDiv.innerHTML = "Login module not loaded. Refresh the page and try again.";
-                    }                },
+                    }
+                },
                 skipLogin: function () {
                     // Skip immediately
                     var overlay = document.getElementById("pekario-login-overlay");
@@ -31,9 +32,18 @@
                             overlay.style.display = "none";
                             var canvas = document.getElementById("canvas");
                             if (canvas) canvas.style.display = "block";
+                            if (!window.Enjine || !window.Mario || !window.Mario.LoadingState) {
+                                var errDiv = document.getElementById("pekario-login-error");
+                                if (errDiv) {
+                                    errDiv.style.display = "block";
+                                    errDiv.innerHTML = "Game files failed to load (host timeout/522). Refresh and try again.";
+                                }
+                                return;
+                            }
                             new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
                         }, 650);
-                    }                }
+                    }
+                }
             };
         </script>
         <style>

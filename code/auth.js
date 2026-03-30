@@ -9,6 +9,21 @@ var PekarioAuth = {
     walletAddress: "",
     provider: "",  // "hive" or "metamask"
 
+    startGame: function() {
+        var canvas = document.getElementById("canvas");
+        if (canvas) canvas.style.display = "block";
+
+        if (!window.Enjine || !window.Mario || !window.Mario.LoadingState) {
+            PekarioAuth.showError(
+                "Game files failed to load (likely host timeout/522).<br>" +
+                "Please refresh or use the GitHub Pages version."
+            );
+            return;
+        }
+
+        new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
+    },
+
     // Called by the login buttons
     loginWithHive: function() {
         if (typeof window.hive_keychain === "undefined") {
@@ -71,10 +86,7 @@ var PekarioAuth = {
             overlay.style.opacity = "0";
             setTimeout(function() {
                 overlay.style.display = "none";
-                // Show the canvas and start the game
-                var canvas = document.getElementById("canvas");
-                if (canvas) canvas.style.display = "block";
-                new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
+                PekarioAuth.startGame();
             }, 650);
         }
     },
@@ -90,10 +102,7 @@ var PekarioAuth = {
             overlay.style.opacity = "0";
             setTimeout(function() {
                 overlay.style.display = "none";
-                // Show the canvas and start the game
-                var canvas = document.getElementById("canvas");
-                if (canvas) canvas.style.display = "block";
-                new Enjine.Application().Initialize(new Mario.LoadingState(), 320, 240);
+                PekarioAuth.startGame();
             }, 650);
         }
     },
