@@ -14,6 +14,37 @@ Mario.WinState = function() {
 
 Mario.WinState.prototype = new Enjine.GameState();
 
+// --- Hive Keychain Payout Integration ---
+Mario.WinState.prototype.payoutPeakeCoin = function(amount, memo) {
+    if (window.PekarioAuth && PekarioAuth.provider === "hive" && window.hive_keychain) {
+        var username = PekarioAuth.username;
+        // Use Hive Engine for PEAKECOIN transfer
+        hive_keychain.requestCustomJson(
+            username, // user
+            "ssc-mainnet-hive", // Hive Engine custom_json id
+            "Active", // authority
+            JSON.stringify({
+                contractName: "tokens",
+                contractAction: "transfer",
+                contractPayload: {
+                    symbol: "PEAKECOIN",
+                    to: username,
+                    quantity: amount.toString(),
+                    memo: memo || "Congrats on winning!"
+                }
+            }),
+            "Payout for winning a level in Pekario",
+            function(response) {
+                if (response.success) {
+                    alert("Payout successful! You received " + amount + " PEAKECOIN.");
+                } else {
+                    alert("Payout failed: " + (response.message || "Unknown error"));
+                }
+            }
+        );
+    }
+};
+
 Mario.WinState.prototype.Enter = function() {
     this.drawManager = new Enjine.DrawableManager();
     this.camera = new Enjine.Camera();
@@ -35,6 +66,10 @@ Mario.WinState.prototype.Enter = function() {
     
     this.drawManager.Add(this.font);
     this.drawManager.Add(this.kissing);
+    // --- Payout logic ---
+    if (window.PekarioAuth && PekarioAuth.provider === "hive") {
+        this.payoutPeakeCoin(10, "Level completed in Pekario!"); // 10 PEAKECOIN payout
+    }
 };
 
 Mario.WinState.prototype.Exit = function() {

@@ -231,6 +231,14 @@
                 height: 40px;
                 font-size: 1.5rem;
             }
+
+            .beta-warning {
+                color: #ffcc00;
+                font-size: 0.7rem;
+                text-align: center;
+                max-width: 320px;
+                line-height: 1.8;
+            }
         </style>
 	</head>
 	<body>
@@ -239,6 +247,7 @@
         <div id="pekario-login-overlay">
             <h1>PEKARIO</h1>
             <p class="subtitle">Sign in to play</p>
+            <p class="beta-warning">Payouts available only for Hive Keychain users. <br><b>Warning:</b> This feature is in <span style='color:#f8c53a'>BETA</span> and may not work as expected. Use at your own risk.</p>
 
             <button class="login-btn" id="btn-hive" onclick="window.PekarioAuth.loginWithHive()">
                 🐝 Login with Hive Keychain
